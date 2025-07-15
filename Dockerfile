@@ -1,6 +1,6 @@
 FROM python:3.12
 
-WORKDIR /app
+WORKDIR /workspace
 
 SHELL ["/bin/bash", "-c"]
 
@@ -11,5 +11,4 @@ ENV PATH="$HOME/.local/bin/:$PATH"
 
 COPY . .
 
-CMD ~/.local/bin/uv run -- python3 main.py
-# CMD uv run -- python3 main.py
+CMD ~/.local/bin/uv run -- fastapi run app/api.py
