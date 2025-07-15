@@ -24,7 +24,6 @@ class Worker:
 
         self.queue.receive_message(on_message)
 
-    # TODO: change str to Path?
     def convert_image(self, file: io.BytesIO) -> io.BytesIO:
         image = Image.open(file)
 

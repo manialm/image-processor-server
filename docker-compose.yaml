@@ -1,0 +1,33 @@
+
+services:
+  api:
+    build:
+      context: .
+    container_name: fastapi-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    # environment:
+    #   RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_prometheus listen_port 15692"
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+volumes:
+  rabbitmq_data:
