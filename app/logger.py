@@ -1,5 +1,6 @@
 import logging
 
+
 def get_logger(name: str):
 
     class Filter(logging.Filter):
@@ -12,7 +13,7 @@ def get_logger(name: str):
     handler = logging.StreamHandler()
     handler.addFilter(Filter())
     # logger.handlers.clear()
-    formatter = logging.Formatter('[%(name)s] %(levelname)s: %(message)s')
+    formatter = logging.Formatter("[%(name)s] %(levelname)s: %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 

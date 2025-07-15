@@ -6,6 +6,7 @@ from app.minio_client import MinioClient
 
 app = FastAPI()
 
+
 @app.post("/upload")
 async def upload_image(file: UploadFile):
     minio_client = MinioClient()
@@ -15,7 +16,7 @@ async def upload_image(file: UploadFile):
     # TODO: give unique name to file
 
     content_type = file.content_type or "image/png"
-    extension = content_type.split('/')[1]
+    extension = content_type.split("/")[1]
     filename = file.filename or f"{uuid4()}.{extension}"
     size = file.size or 0
 
