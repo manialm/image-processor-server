@@ -1,8 +1,10 @@
-from typing import BinaryIO
+from typing import Annotated, BinaryIO
 import logging
 
+from fastapi import Depends
 from minio import Minio
 from minio.error import S3Error
+from functools import lru_cache
 
 from app.core.settings import settings
 
@@ -29,21 +31,17 @@ class MinioClient:
     ):
         if not self.client.bucket_exists(bucket_name):
             self.client.make_bucket(bucket_name)
-            logger.info(f"Bucket {bucket_name} created.")
+            logger.info(f"Bucket '{bucket_name}' created.")
         else:
-            logger.info(f"Bucket {bucket_name} already exists.")
+            logger.info(f"Bucket '{bucket_name}' already exists.")
 
         result = self.client.put_object(
             bucket_name, filename, file_data, file_size, content_type
         )
 
-        # check for success
-        if result.object_name:
-            logger.info(
-                f"{result.object_name} successfully uploaded to bucket {result.bucket_name}."
-            )
-        else:
-            logger.error(f"Error occurred during upload: {result.etag}")
+        logger.info(
+            f"'{result.object_name}' successfully uploaded to bucket '{result.bucket_name}'."
+        )
 
     def upload_file(
         self,
@@ -59,3 +57,27 @@ class MinioClient:
             )
         except S3Error as exc:
             logger.error(f"Error occurred during upload: {exc}")
+
+    def get_file(self, bucket_name: str, filename: str):
+        response = None
+        try:
+            response = self.client.get_object(bucket_name, filename)
+
+            content = response.read()
+            content_type = response.headers.get(
+                "Content-Type", "application/octet-stream"
+            )
+            return content, content_type
+
+        finally:
+            if response:
+                response.close()
+                response.release_conn()
+
+
+@lru_cache()
+def get_minio_client():
+    return MinioClient()
+
+
+MinioClientDep = Annotated[MinioClient, Depends(get_minio_client)]
