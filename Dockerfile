@@ -4,11 +4,9 @@ WORKDIR /workspace
 
 SHELL ["/bin/bash", "-c"]
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-RUN source ~/.local/bin/env
-ENV PATH="$HOME/.local/bin/:$PATH"
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 COPY . .
+RUN uv sync --locked
 
-CMD ~/.local/bin/uv run -- fastapi run app/api.py
+CMD ["uv", "run", "--", "fastapi", "run", "app/api.py"]
