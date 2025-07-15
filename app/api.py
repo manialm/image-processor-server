@@ -4,6 +4,7 @@ from fastapi import FastAPI, Response, UploadFile
 from fastapi.responses import StreamingResponse
 
 from app.minio_client import MinioClientDep
+from app.pika_queue import SendQueue
 
 app = FastAPI()
 
@@ -22,7 +23,13 @@ async def upload_image(file: UploadFile, minio_client: MinioClientDep):
     filename = file.filename or f"{uuid4()}.{extension}"
     size = file.size or 0
 
+    # TODO: Upload to minio and request queue in parallel
     minio_client.upload_file(BUCKET_NAME, filename, file.file, size, content_type)
+
+    # FIXME: make a new SendQueue every time?
+    request_queue = SendQueue(BUCKET_NAME)
+    request_queue.add_to_queue(filename)
+    request_queue.close()
 
     return {"message": "Image uploaded successfully"}
 

@@ -9,5 +9,7 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: str
     MINIO_SECRET_KEY: str
 
+    RABBITMQ_HOST: str
 
-settings = Settings()
+
+settings = Settings()  # type: ignore

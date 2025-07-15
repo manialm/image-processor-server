@@ -31,21 +31,17 @@ class MinioClient:
     ):
         if not self.client.bucket_exists(bucket_name):
             self.client.make_bucket(bucket_name)
-            logger.info(f"Bucket {bucket_name} created.")
+            logger.info(f"Bucket '{bucket_name}' created.")
         else:
-            logger.info(f"Bucket {bucket_name} already exists.")
+            logger.info(f"Bucket '{bucket_name}' already exists.")
 
         result = self.client.put_object(
             bucket_name, filename, file_data, file_size, content_type
         )
 
-        # check for success
-        if result.object_name:
-            logger.info(
-                f"{result.object_name} successfully uploaded to bucket {result.bucket_name}."
-            )
-        else:
-            logger.error(f"Error occurred during upload: {result.etag}")
+        logger.info(
+            f"'{result.object_name}' successfully uploaded to bucket '{result.bucket_name}'."
+        )
 
     def upload_file(
         self,
