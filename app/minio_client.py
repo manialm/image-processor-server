@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Annotated, BinaryIO
 import logging
 
@@ -59,20 +60,16 @@ class MinioClient:
             logger.error(f"Error occurred during upload: {exc}")
 
     def get_file(self, bucket_name: str, filename: str):
-        response = None
-        try:
-            response = self.client.get_object(bucket_name, filename)
+        for _ in range(3):
+            try:
+                url = self.client.presigned_get_object(
+                    bucket_name, filename, timedelta(minutes=30)
+                )
 
-            content = response.read()
-            content_type = response.headers.get(
-                "Content-Type", "application/octet-stream"
-            )
-            return content, content_type
+                return url
 
-        finally:
-            if response:
-                response.close()
-                response.release_conn()
+            except Exception as exc:
+                logger.error(f"Error occurred during get file: {exc}")
 
 
 @lru_cache()

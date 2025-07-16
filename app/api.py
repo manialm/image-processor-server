@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from fastapi import FastAPI, Response, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, HTTPException, Response, UploadFile
+from fastapi.responses import RedirectResponse, StreamingResponse
 
 from app.minio_client import MinioClientDep
 from app.pika_queue import SendQueue
@@ -36,5 +36,9 @@ async def upload_image(file: UploadFile, minio_client: MinioClientDep):
 
 @app.get("/get-file")
 async def get_file(filename: str, minio_client: MinioClientDep):
-    file_data, content_type = minio_client.get_file(BUCKET_NAME, filename)
-    return Response(content=file_data, media_type=content_type)
+    file_url = minio_client.get_file(BUCKET_NAME, filename)
+    if file_url:
+        return RedirectResponse(file_url)
+
+    else:
+        raise HTTPException(status_code=404, detail=f"Failed to get file {filename}")
