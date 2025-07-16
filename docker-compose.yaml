@@ -13,13 +13,29 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
+    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
       - "15692:15692"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     # environment:
     #   RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_prometheus listen_port 15692"
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - "8080:8080"
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:ro
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+      - rabbitmq
+      - api
 
   prometheus:
     image: prom/prometheus:latest
@@ -29,5 +45,14 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
+    depends_on:
+      - cadvisor
+      - rabbitmq
+      - api
+
+
+      
+
 volumes:
   rabbitmq_data:
+
