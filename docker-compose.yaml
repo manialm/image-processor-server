@@ -19,7 +19,7 @@ services:
       - "15672:15672"
       - "15692:15692"
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq-data:/var/lib/rabbitmq
     # environment:
     #   RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_prometheus listen_port 15692"
 
@@ -44,6 +44,9 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      -  prometheus-data:/prometheus
+    env_file:
+      - '.env'
 
     depends_on:
       - cadvisor
@@ -54,5 +57,6 @@ services:
       
 
 volumes:
-  rabbitmq_data:
+  rabbitmq-data:
+  prometheus-data:
 
