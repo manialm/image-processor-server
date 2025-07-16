@@ -1,5 +1,5 @@
 # image-processor-server
-Image processing server built with with RabbitMQ, MinIO, and monitoring with Grafana, Kubernetes
+Image processing server built with with RabbitMQ, MinIO, and monitoring with cAdvisor, Prometheus and Grafana
 
 # How to run
 Run the containers with docker compose:
