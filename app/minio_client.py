@@ -59,7 +59,7 @@ class MinioClient:
         except S3Error as exc:
             logger.error(f"Error occurred during upload: {exc}")
 
-    def get_file(self, bucket_name: str, filename: str):
+    def get_file_url(self, bucket_name: str, filename: str):
         for _ in range(3):
             try:
                 url = self.client.presigned_get_object(
@@ -70,6 +70,24 @@ class MinioClient:
 
             except Exception as exc:
                 logger.error(f"Error occurred during get file: {exc}")
+    
+    def get_file(self, bucket_name: str, filename: str):
+        response = None
+        try:
+            response = self.client.get_object(bucket_name, filename)
+
+            content = response.read()
+            # content_type = response.headers.get(
+            #     "Content-Type", "application/octet-stream"
+            # )
+            return content
+
+        finally:
+            if response:
+                response.close()
+                response.release_conn()
+
+
 
 
 @lru_cache()

@@ -36,7 +36,7 @@ async def upload_image(file: UploadFile, minio_client: MinioClientDep):
 
 @app.get("/get-file")
 async def get_file(filename: str, minio_client: MinioClientDep):
-    file_url = minio_client.get_file(BUCKET_NAME, filename)
+    file_url = minio_client.get_file_url(BUCKET_NAME, filename)
     if file_url:
         return RedirectResponse(file_url)
 

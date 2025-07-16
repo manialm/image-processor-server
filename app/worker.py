@@ -15,7 +15,7 @@ class Worker:
 
     def process_queue(self):
         def on_message(filename: str):
-            file_data, content_type = self.client.get_file(BUCKET_SRC, filename)
+            file_data = self.client.get_file(BUCKET_SRC, filename)
             file = io.BytesIO(file_data)
             output = self.convert_image(file)
 
