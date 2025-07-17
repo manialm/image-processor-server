@@ -2,7 +2,7 @@ import io
 from PIL import Image
 
 from app.minio_client import MinioClient
-from app.pika_queue import ReceiveQueue
+from app.pika_queue import ReceiveQueue, SendQueue
 
 BUCKET_SRC = "to-process"
 BUCKET_DEST = "processed"
@@ -11,7 +11,8 @@ BUCKET_DEST = "processed"
 class Worker:
     def __init__(self):
         self.client = MinioClient()
-        self.queue = ReceiveQueue(BUCKET_SRC)
+        self.request_queue = ReceiveQueue(BUCKET_SRC)
+        self.response_queue = SendQueue(BUCKET_DEST)
 
     def process_queue(self):
         def on_message(filename: str):
@@ -21,8 +22,9 @@ class Worker:
 
             size = output.getbuffer().nbytes
             self.client.upload_file(BUCKET_DEST, filename, output, size, "image/png")
+            self.response_queue.add_to_queue(f"Processed {filename}")
 
-        self.queue.receive_message(on_message)
+        self.request_queue.receive_message(on_message)
 
     def convert_image(self, file: io.BytesIO) -> io.BytesIO:
         image = Image.open(file)

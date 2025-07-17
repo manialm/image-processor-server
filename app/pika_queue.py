@@ -21,11 +21,11 @@ class Queue(ABC):
 
 
 class SendQueue(Queue):
-    def add_to_queue(self, filename: str):
+    def add_to_queue(self, message: str):
         self.channel.basic_publish(
             exchange="",
             routing_key=self.queue_name,
-            body=filename,
+            body=message,
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
         )
 

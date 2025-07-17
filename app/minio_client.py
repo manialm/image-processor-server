@@ -70,7 +70,7 @@ class MinioClient:
 
             except Exception as exc:
                 logger.error(f"Error occurred during get file: {exc}")
-    
+
     def get_file(self, bucket_name: str, filename: str):
         response = None
         try:
@@ -86,8 +86,6 @@ class MinioClient:
             if response:
                 response.close()
                 response.release_conn()
-
-
 
 
 @lru_cache()
