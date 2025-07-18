@@ -15,7 +15,7 @@ scrape_configs:
       - targets: ['cadvisor:8080']
   
   - job_name: minio-job
-    bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcm9tZXRoZXVzIiwiZXhwIjo0OTA2MjYzNzExfQ.3LaClfXz30nvHD4qarBoXODZMK4aG96aj_xjeKm89FeS2TJd54oLTE1g3K_y-idZHsCifVX3lnCttAEau8ySOQ
+    bearer_token: ${MINIO_BEARER_TOKEN}
     metrics_path: /minio/v2/metrics/cluster
     # scheme: http
     static_configs:

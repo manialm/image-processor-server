@@ -3,6 +3,7 @@ services:
   api:
     build:
       context: .
+      network: host
     container_name: fastapi-app
     ports:
       - "8000:8000"
@@ -10,6 +11,11 @@ services:
       - rabbitmq
     env_file:
       - .env
+    working_dir: /workspace
+
+    # for live reloading
+    volumes:
+      - ./app:/workspace/app
 
   rabbitmq:
     image: rabbitmq:management
@@ -59,4 +65,3 @@ services:
 volumes:
   rabbitmq-data:
   prometheus-data:
-
