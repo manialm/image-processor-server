@@ -62,7 +62,7 @@ async def upload_image(
 
 
 @app.get("/get-file")
-async def get_file(filename: str, minio_client: MinioClientDep):
+def get_file(filename: str, minio_client: MinioClientDep):
     try:
         file_url = minio_client.get_file_url(BUCKET_NAME, filename)
     except RetryError as exc:
