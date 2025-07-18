@@ -1,11 +1,11 @@
 from datetime import timedelta
 from typing import Annotated, BinaryIO
-import logging
+from functools import lru_cache
 
 from fastapi import Depends
 from minio import Minio
 from minio.error import S3Error
-from functools import lru_cache
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.core.settings import settings
 
@@ -44,6 +44,9 @@ class MinioClient:
             f"'{result.object_name}' successfully uploaded to bucket '{result.bucket_name}'."
         )
 
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15)
+    )
     def upload_file(
         self,
         bucket_name: str,
@@ -58,18 +61,22 @@ class MinioClient:
             )
         except S3Error as exc:
             logger.error(f"Error occurred during upload: {exc}")
+            raise
 
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15)
+    )
     def get_file_url(self, bucket_name: str, filename: str):
-        for _ in range(3):
-            try:
-                url = self.client.presigned_get_object(
-                    bucket_name, filename, timedelta(minutes=30)
-                )
+        try:
+            url = self.client.presigned_get_object(
+                bucket_name, filename, timedelta(minutes=30)
+            )
 
-                return url
+            return url
 
-            except Exception as exc:
-                logger.error(f"Error occurred during get file: {exc}")
+        except Exception as exc:
+            logger.error(f"Error occurred during get file: {exc}")
+            raise
 
     def get_file(self, bucket_name: str, filename: str):
         response = None
