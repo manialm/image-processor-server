@@ -8,7 +8,7 @@ from .generate_random_image import generate_random_image
 
 client = TestClient(app)
 
-filename = f"{uuid4()}.png"
+filename = f"dog.png"
 
 
 def test_api():
@@ -26,7 +26,7 @@ def test_upload_image():
 
 def test_get_file():
     response = client.get(
-        "/get-file", params={"filename": "dog.png"}, follow_redirects=False
+        "/get-file", params={"filename": filename}, follow_redirects=False
     )
     assert response.status_code == 307
     assert "minio" in response.headers["Location"].lower()
