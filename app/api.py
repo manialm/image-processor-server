@@ -21,7 +21,11 @@ def index():
 
 
 @app.post("/upload")
-async def upload_image(file: UploadFile, filename: Annotated[str | None, Body(embed=True)], minio_client: MinioClientDep):
+async def upload_image(
+    file: UploadFile,
+    filename: Annotated[str | None, Body(embed=True)],
+    minio_client: MinioClientDep,
+):
 
     # TODO: give unique name to file
 
