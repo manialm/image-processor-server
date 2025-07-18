@@ -17,9 +17,7 @@ def test_api():
 
 
 def test_upload_image():
-    response = client.post(
-        "/upload", files={"file": generate_random_image()}, data={"filename": filename}
-    )
+    response = client.post("/upload", files={"file": generate_random_image()})
     assert response.status_code == 200
     assert response.json() == {"message": "Image uploaded successfully"}
 
@@ -28,4 +26,7 @@ def test_get_file():
     response = client.get("/get-file", params={"filename": filename})
     assert response.status_code == 307
     assert "minio" in response.headers["Location"].lower()
+
+    response = client.get(response.headers["Location"])
+    assert response.status_code == 200
     assert response.headers["Content-Type"] == "image/png"
