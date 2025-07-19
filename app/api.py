@@ -88,7 +88,7 @@ def try_upload_image(
 
 def get_file(filename: str, bucket: str, minio_client: MinioClientDep):
     try:
-        file_url = minio_client.get_file_url(settings.BUCKET_TO_PROCESS, filename)
+        file_url = minio_client.get_file_url(bucket, filename)
     except RetryError as exc:
         raise HTTPException(status_code=500, detail=f"Failed to get file: {exc}")
 
