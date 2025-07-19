@@ -3,6 +3,7 @@ services:
   api:
     build:
       context: .
+      network: host
     container_name: fastapi-app
     ports:
       - "8000:8000"
