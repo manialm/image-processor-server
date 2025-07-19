@@ -86,8 +86,7 @@ def try_upload_image(
     return {"message": "Image uploaded successfully"}
 
 
-@app.get("/get-file")
-def get_file(filename: str, minio_client: MinioClientDep):
+def get_file(filename: str, bucket: str, minio_client: MinioClientDep):
     try:
         file_url = minio_client.get_file_url(settings.BUCKET_TO_PROCESS, filename)
     except RetryError as exc:
@@ -98,6 +97,16 @@ def get_file(filename: str, minio_client: MinioClientDep):
 
     else:
         raise HTTPException(status_code=404, detail=f"Failed to get file: {filename}")
+
+
+@app.get("/get-uploaded-file")
+def get_uploaded_file(filename: str, minio_client: MinioClientDep):
+    return get_file(filename, settings.BUCKET_TO_PROCESS, minio_client)
+
+
+@app.get("/get-processed-file")
+def get_processed_file(filename: str, minio_client: MinioClientDep):
+    return get_file(filename, settings.BUCKET_PROCESSED, minio_client)
 
 
 @app.get("/processed")
