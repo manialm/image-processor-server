@@ -8,10 +8,17 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - .env
     working_dir: /workspace
+    command: >
+      sh -c "
+        uv run -- uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload --log-level info &
+        uv run -- python -m app.worker &
+        uv run -- python -m app.db
+      "
 
     # for live reloading
     volumes:
@@ -20,6 +27,12 @@ services:
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+
     ports:
       - "5672:5672"
       - "15672:15672"
