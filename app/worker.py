@@ -38,7 +38,7 @@ class Worker:
 
         image_grayscale = image.convert("L")
         output = io.BytesIO()
-        image_grayscale.save(output, format="PNG")
+        image_grayscale.save(output, optimize=True, quality=85, format="PNG")
         output.seek(0)
 
         return output
