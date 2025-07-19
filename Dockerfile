@@ -6,6 +6,8 @@ SHELL ["/bin/bash", "-c"]
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+ENV PYTHONUNBUFFERED=1
+
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked
 

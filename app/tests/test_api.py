@@ -10,6 +10,7 @@ from .generate_random_image import generate_random_image
 
 client = TestClient(app)
 
+
 def make_filename():
     return f"{uuid4()}.png"
 

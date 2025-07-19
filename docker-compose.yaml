@@ -15,9 +15,14 @@ services:
     working_dir: /workspace
     command: >
       sh -c "
+        if [ \"${TEST:-}\" = \"1\" ]; then
+          uv run -- pytest --disable-warnings -q;
+        fi
+
         uv run -- uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload --log-level info &
         uv run -- python -m app.worker &
         uv run -- python -m app.db
+        wait
       "
 
     # for live reloading
