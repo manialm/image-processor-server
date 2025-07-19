@@ -7,7 +7,7 @@ Run the containers with docker compose:
 docker compose up -d
 ```
 
-Run the worker:
+# Run with tests
 ```bash
-docker exec -it fastapi-app uv run -- python -m app.worker
+TEST=1 docker compose up --build --attach api
 ```
