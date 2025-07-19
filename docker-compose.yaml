@@ -11,7 +11,16 @@ services:
       rabbitmq:
         condition: service_healthy
     env_file:
-      - .env
+      - path: .env
+        required: false
+    environment:
+      - MINIO_HOST=${MINIO_HOST}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BEARER_TOKEN=${MINIO_BEARER_TOKEN}
+      - BUCKET_TO_PROCESS=${BUCKET_TO_PROCESS}
+      - BUCKET_PROCESSED=${BUCKET_PROCESSED}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
     working_dir: /workspace
     command: >
       sh -c "
