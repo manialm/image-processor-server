@@ -1,0 +1,74 @@
+{
+  "id": null,
+  "uid": "minio-dash",
+  "title": "MinIO Dashboard",
+  "panels": [
+    {
+      "id": 20,
+      "type": "stat",
+      "title": "Total S3 Ingress (bytes)",
+      "targets": [
+        {
+          "expr": "sum(minio_s3_traffic_received_bytes)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 }
+    },
+    {
+      "id": 21,
+      "type": "stat",
+      "title": "Total S3 Egress (bytes)",
+      "targets": [
+        {
+          "expr": "sum(minio_s3_traffic_sent_bytes)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 }
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "S3 Request Rate (req/s)",
+      "targets": [
+        {
+          "expr": "sum(rate(minio_s3_requests_total[5m]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } },
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 4 }
+    },
+    {
+      "id": 23,
+      "type": "stat",
+      "title": "Number of Objects",
+      "targets": [
+        {
+          "expr": "max(minio_cluster_usage_object_total)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "gridPos": { "x": 0, "y": 4, "w": 4, "h": 4 }
+    },
+    {
+      "id": 24,
+      "type": "stat",
+      "title": "Capacity Used (%)",
+      "targets": [
+        {
+          "expr": "(sum(minio_cluster_capacity_usable_total_bytes) - sum(minio_cluster_capacity_usable_free_bytes)) / sum(minio_cluster_capacity_usable_total_bytes) * 100",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } },
+      "gridPos": { "x": 4, "y": 4, "w": 4, "h": 4 }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}
