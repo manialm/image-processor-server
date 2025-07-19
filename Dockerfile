@@ -11,4 +11,4 @@ RUN uv sync --locked
 
 COPY . .
 
-CMD ["uv", "run", "--", "fastapi", "run", "app/api.py", "--reload"]
+CMD ["uv", "run", "--", "uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "info"]

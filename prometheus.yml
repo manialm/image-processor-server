@@ -16,7 +16,7 @@ scrape_configs:
   
   - job_name: minio-job
     bearer_token: ${MINIO_BEARER_TOKEN}
-    metrics_path: /minio/v2/metrics/cluster
+    metrics_path: /minio/v2/metrics/node
     # scheme: http
     static_configs:
       - targets: ['${MINIO_HOST}:9000']

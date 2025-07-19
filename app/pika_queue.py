@@ -1,5 +1,4 @@
-from typing import Annotated, Callable
-from fastapi import Depends
+from typing import Callable
 import pika
 
 from app.core.settings import settings

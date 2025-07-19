@@ -9,9 +9,10 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.core.settings import settings
 
-from app.logger import get_logger
+# from app.logger import get_logger
+from logging import getLogger
 
-logger = get_logger(__name__)
+logger = getLogger("uvicorn.error")
 
 
 class MinioClient:
@@ -56,6 +57,7 @@ class MinioClient:
         content_type: str,
     ):
         try:
+            logger.info(f"Attempting to upload file {filename} to bucket {bucket_name}")
             self.try_upload_file(
                 bucket_name, filename, file_data, file_size, content_type
             )
@@ -68,6 +70,7 @@ class MinioClient:
     )
     def get_file_url(self, bucket_name: str, filename: str):
         try:
+            logger.info(f"Attempting to get file url for {filename}")
             url = self.client.presigned_get_object(
                 bucket_name, filename, timedelta(minutes=30)
             )
@@ -78,6 +81,9 @@ class MinioClient:
             logger.error(f"Error occurred during get file: {exc}")
             raise
 
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=15)
+    )
     def get_file(self, bucket_name: str, filename: str):
         response = None
         try:
