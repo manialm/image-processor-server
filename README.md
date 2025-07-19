@@ -11,3 +11,16 @@ docker compose up -d
 ```bash
 TEST=1 docker compose up --build --attach api
 ```
+
+# Example commands
+0. Install [httpie](https://httpie.io/)
+
+1. Upload image:
+```bash
+http POST localhost:8000/upload --form file@image.png
+```
+
+2. Download image:
+```bash
+http --follow localhost:8000/get-processed-file?filename=dog.png > out.png
+```
