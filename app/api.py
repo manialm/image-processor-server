@@ -21,39 +21,63 @@ def index():
     return {"message": "FastAPI running"}
 
 
-@app.post("/upload")
-async def upload_image(
-    file: UploadFile,
-    minio_client: MinioClientDep,
-):
-
-    # TODO: give unique name to file
-
+def verify_content_type(file: UploadFile):
     if file.content_type not in ("image/png", "application/octet-stream"):
         raise HTTPException(status_code=400, detail="Must be a PNG image")
 
-    # Verify the file is a valid PNG image
+
+def verify_image_is_valid(file: UploadFile):
     try:
         im = Image.open(file.file)
 
         # .verify() closes image after it's finished
         im.verify()
-        file.file.seek(0)  # Reset pointer for later use
+        file.file.seek(0)
 
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Invalid image file: {exc}")
 
+
+def upload_image_to_minio(
+    filename: str, file: UploadFile, minio_client: MinioClientDep
+):
+
     content_type = "image/png"
-    filename = file.filename or f"{uuid4()}.png"
     size = file.size or 0
 
-    # TODO: Upload to minio and request queue in parallel
     try:
         minio_client.upload_file(
             settings.BUCKET_TO_PROCESS, filename, file.file, size, content_type
         )
     except RetryError as exc:
         raise HTTPException(status_code=500, detail=f"Failed to upload image: {exc}")
+
+
+@app.post("/upload")
+def upload_image(
+    file: UploadFile,
+    minio_client: MinioClientDep,
+):
+    try:
+        return try_upload_image(file, minio_client)
+    except HTTPException:
+        with SendQueue(settings.BUCKET_PROCESSED) as queue:
+            queue.add_to_queue(f"Failed to process {file.filename}")
+        raise
+
+
+def try_upload_image(
+    file: UploadFile,
+    minio_client: MinioClientDep,
+):
+
+    # TODO: give unique name to file
+    verify_content_type(file)
+    verify_image_is_valid(file)
+
+    filename = file.filename or f"{uuid4()}.png"
+
+    upload_image_to_minio(filename, file, minio_client)
 
     # FIXME: make a new SendQueue every time?
     with SendQueue(settings.BUCKET_TO_PROCESS) as request_queue:

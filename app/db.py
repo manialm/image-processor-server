@@ -35,7 +35,7 @@ class DB:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
-        if getattr(self, 'response_queue', None):
+        if getattr(self, "response_queue", None):
             self.response_queue.close()
 
 
