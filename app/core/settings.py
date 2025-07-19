@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     MINIO_SECRET_KEY: str
     MINIO_BEARER_TOKEN: str
 
+    BUCKET_TO_PROCESS: str
+    BUCKET_PROCESSED: str
+
     RABBITMQ_HOST: str
 
 

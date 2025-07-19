@@ -8,12 +8,11 @@ from PIL import Image
 from tenacity import RetryError
 
 from app.minio_client import MinioClientDep
-from app.pika_queue import SendQueue
+from app.pika_queue import ReceiveQueue, SendQueue
+from app.core.settings import settings
 
 
 app = FastAPI()
-
-BUCKET_NAME = "to-process"
 
 
 @app.get("/")
@@ -49,14 +48,15 @@ async def upload_image(
 
     # TODO: Upload to minio and request queue in parallel
     try:
-        minio_client.upload_file(BUCKET_NAME, filename, file.file, size, content_type)
+        minio_client.upload_file(
+            settings.BUCKET_TO_PROCESS, filename, file.file, size, content_type
+        )
     except RetryError as exc:
         raise HTTPException(status_code=500, detail=f"Failed to upload image: {exc}")
 
     # FIXME: make a new SendQueue every time?
-    request_queue = SendQueue(BUCKET_NAME)
-    request_queue.add_to_queue(filename)
-    request_queue.close()
+    with SendQueue(settings.BUCKET_TO_PROCESS) as request_queue:
+        request_queue.add_to_queue(filename)
 
     return {"message": "Image uploaded successfully"}
 
@@ -64,7 +64,7 @@ async def upload_image(
 @app.get("/get-file")
 def get_file(filename: str, minio_client: MinioClientDep):
     try:
-        file_url = minio_client.get_file_url(BUCKET_NAME, filename)
+        file_url = minio_client.get_file_url(settings.BUCKET_TO_PROCESS, filename)
     except RetryError as exc:
         raise HTTPException(status_code=500, detail=f"Failed to get file: {exc}")
 

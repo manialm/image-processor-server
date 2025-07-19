@@ -15,6 +15,12 @@ class Queue(ABC):
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=queue_name, durable=True)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def close(self):
         self.connection.close()
 
@@ -30,7 +36,7 @@ class SendQueue(Queue):
 
 
 class ReceiveQueue(Queue):
-    def receive_message(self, on_message: Callable[[str], None]):
+    def receive_messages(self, on_message: Callable[[str], None]):
         self.on_message = on_message
 
         self.channel.basic_qos(prefetch_count=1)

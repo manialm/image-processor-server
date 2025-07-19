@@ -9,10 +9,10 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.core.settings import settings
 
-# from app.logger import get_logger
-from logging import getLogger
+import logging
 
-logger = getLogger("uvicorn.error")
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG) 
 
 
 class MinioClient:
@@ -33,15 +33,15 @@ class MinioClient:
     ):
         if not self.client.bucket_exists(bucket_name):
             self.client.make_bucket(bucket_name)
-            logger.info(f"Bucket '{bucket_name}' created.")
+            logger.debug(f"Bucket '{bucket_name}' created.")
         else:
-            logger.info(f"Bucket '{bucket_name}' already exists.")
+            logger.debug(f"Bucket '{bucket_name}' already exists.")
 
         result = self.client.put_object(
             bucket_name, filename, file_data, file_size, content_type
         )
 
-        logger.info(
+        logger.debug(
             f"'{result.object_name}' successfully uploaded to bucket '{result.bucket_name}'."
         )
 
@@ -57,7 +57,7 @@ class MinioClient:
         content_type: str,
     ):
         try:
-            logger.info(f"Attempting to upload file {filename} to bucket {bucket_name}")
+            logger.debug(f"Attempting to upload file {filename} to bucket {bucket_name}")
             self.try_upload_file(
                 bucket_name, filename, file_data, file_size, content_type
             )
@@ -70,7 +70,7 @@ class MinioClient:
     )
     def get_file_url(self, bucket_name: str, filename: str):
         try:
-            logger.info(f"Attempting to get file url for {filename}")
+            logger.debug(f"Attempting to get file url for {filename}")
             url = self.client.presigned_get_object(
                 bucket_name, filename, timedelta(minutes=30)
             )
