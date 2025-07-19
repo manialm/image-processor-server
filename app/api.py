@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from PIL import Image
 from tenacity import RetryError
 
+from app.db import DB
 from app.minio_client import MinioClientDep
 from app.pika_queue import ReceiveQueue, SendQueue
 from app.core.settings import settings
@@ -73,3 +74,11 @@ def get_file(filename: str, minio_client: MinioClientDep):
 
     else:
         raise HTTPException(status_code=404, detail=f"Failed to get file: {filename}")
+
+
+@app.get("/processed")
+def processed():
+    with DB() as db:
+        messages = db.get_messages()
+
+    return {"messages": messages}

@@ -12,7 +12,7 @@ from app.core.settings import settings
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG) 
+logging.basicConfig(level=logging.DEBUG)
 
 
 class MinioClient:
@@ -57,7 +57,9 @@ class MinioClient:
         content_type: str,
     ):
         try:
-            logger.debug(f"Attempting to upload file {filename} to bucket {bucket_name}")
+            logger.debug(
+                f"Attempting to upload file {filename} to bucket {bucket_name}"
+            )
             self.try_upload_file(
                 bucket_name, filename, file_data, file_size, content_type
             )

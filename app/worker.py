@@ -7,7 +7,7 @@ from app.pika_queue import ReceiveQueue, SendQueue
 from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG) 
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Worker:
